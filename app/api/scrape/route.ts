@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import { supabase } from '@/lib/supabase';
 
 // 设置API路由超时时间（Vercel Pro: 300s, Hobby: 10s）

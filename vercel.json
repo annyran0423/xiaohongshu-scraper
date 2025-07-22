@@ -1,0 +1,21 @@
+{
+  "buildCommand": "npm run build",
+  "framework": "nextjs",
+  "functions": {
+    "app/api/scrape/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/categorize/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/summary/route.ts": {
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
+    "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/google-chrome-stable"
+  },
+  "regions": ["iad1"],
+  "crons": []
+}
