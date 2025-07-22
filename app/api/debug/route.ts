@@ -1,86 +1,85 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer-core';
 
-// 调试API - 查看页面实际内容
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { keyword = '美食' } = await request.json();
-    
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process'
-      ]
-    });
+    const searchParams = request.nextUrl.searchParams;
+    const action = searchParams.get('action') || 'status';
 
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    
-    // 尝试访问小红书首页而不是搜索页面
-    const url = 'https://www.xiaohongshu.com';
-    console.log('正在访问:', url);
-    
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // 获取页面基本信息
-    const pageInfo = await page.evaluate(() => {
-      return {
-        title: document.title,
-        url: window.location.href,
-        bodyText: document.body.innerText.substring(0, 500),
-        htmlSnippet: document.body.innerHTML.substring(0, 1000),
-        elementCounts: {
-          totalElements: document.querySelectorAll('*').length,
-          links: document.querySelectorAll('a').length,
-          images: document.querySelectorAll('img').length,
-          sections: document.querySelectorAll('section').length,
-          divs: document.querySelectorAll('div').length
+    // 简化版本 - 返回系统状态信息
+    const debugInfo = {
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      nextVersion: '14.2.0',
+      nodeVersion: process.version,
+      platform: process.platform,
+      status: 'healthy',
+      services: {
+        supabase: {
+          configured: !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+          status: 'ready'
+        },
+        scraping: {
+          mode: 'mock',
+          status: 'available',
+          note: '当前使用模拟数据模式'
         }
-      };
-    });
-    
-    // 尝试找到任何可能的帖子链接
-    const potentialLinks = await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('a[href*="/explore/"], a[href*="/discovery/"], a[href*="/user/"]'));
-      return links.slice(0, 10).map(link => ({
-        href: link.href,
-        text: link.textContent?.trim() || '',
-        innerHTML: link.innerHTML.substring(0, 200)
-      }));
-    });
-
-    await browser.close();
-    
-    return NextResponse.json({
-      success: true,
-      message: '页面调试信息',
-      data: {
-        pageInfo,
-        potentialLinks,
-        keyword
+      },
+      routes: {
+        '/api/scrape': 'available (mock mode)',
+        '/api/categorize': 'available',
+        '/api/summary': 'available',
+        '/api/debug': 'available'
       }
-    });
-    
+    };
+
+    switch (action) {
+      case 'health':
+        return NextResponse.json({
+          status: 'ok',
+          message: '系统运行正常',
+          timestamp: new Date().toISOString()
+        });
+      
+      case 'env':
+        return NextResponse.json({
+          hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+          hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          nodeEnv: process.env.NODE_ENV,
+          platform: process.platform
+        });
+      
+      default:
+        return NextResponse.json(debugInfo);
+    }
+
   } catch (error) {
-    console.error('调试错误:', error);
-    return NextResponse.json({
-      success: false,
-      message: '调试失败',
-      error: error instanceof Error ? error.message : '未知错误'
-    }, { status: 500 });
+    console.error('Debug API Error:', error);
+    return NextResponse.json(
+      { 
+        error: '调试信息获取失败',
+        timestamp: new Date().toISOString()
+      },
+      { status: 500 }
+    );
   }
 }
 
-export async function GET() {
-  return NextResponse.json({
-    message: '调试API - 查看小红书页面内容',
-    usage: 'POST /api/debug with optional keyword parameter'
-  });
+export async function POST(request: NextRequest) {
+  try {
+    const { test } = await request.json();
+    
+    return NextResponse.json({
+      message: '调试测试完成',
+      receivedData: { test },
+      timestamp: new Date().toISOString(),
+      status: 'success'
+    });
+    
+  } catch (error) {
+    console.error('Debug POST Error:', error);
+    return NextResponse.json(
+      { error: '调试测试失败' },
+      { status: 500 }
+    );
+  }
 }

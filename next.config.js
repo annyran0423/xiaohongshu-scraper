@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   /* config options here */
   // 生产环境优化配置
   experimental: {
@@ -124,4 +123,4 @@ const nextConfig: NextConfig = {
   })
 };
 
-export default nextConfig;
+module.exports = nextConfig;
