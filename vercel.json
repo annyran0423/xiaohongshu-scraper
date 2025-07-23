@@ -2,16 +2,18 @@
   "version": 2,
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "nodeVersion": "18.x",
   "functions": {
     "app/api/scrape/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 300,
+      "runtime": "nodejs18.x"
     },
     "app/api/categorize/route.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "runtime": "nodejs18.x"
     },
     "app/api/summary/route.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "runtime": "nodejs18.x"
     }
   },
   "env": {
