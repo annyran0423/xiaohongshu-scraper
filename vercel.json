@@ -1,6 +1,8 @@
 {
-  "buildCommand": "npm run build",
+  "version": 2,
   "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "nodeVersion": "18.x",
   "functions": {
     "app/api/scrape/route.ts": {
       "maxDuration": 300
@@ -14,8 +16,11 @@
   },
   "env": {
     "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
-    "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/google-chrome-stable"
+    "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/google-chrome-stable",
+    "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@next_public_supabase_anon_key"
   },
   "regions": ["iad1"],
+  "installCommand": "npm install",
   "crons": []
 }
